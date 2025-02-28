@@ -1,3 +1,3 @@
 # Stat100proj
 
-this is another test
+this is test

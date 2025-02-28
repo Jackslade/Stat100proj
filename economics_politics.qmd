@@ -1,0 +1,33 @@
+---
+title: "Economic Status and Political Affiliation"
+format: html
+---
+
+```{r}
+library(tidyverse)
+```
+
+# Simulated Data
+```{r}
+simulated_data <-
+  tibble(
+    # Randomly pick an option, with replacement, 250 times
+    "Party" = sample(
+      x = c("Republican", "Democrat", "Other"),
+      size = 250,
+      replace = TRUE ),
+    # Randomly pick an option, with replacement, 250 times
+    "Status" = sample(
+      x = c("Lower", "Middle", "Upper"),
+      size = 250,
+      replace = TRUE ),
+    # Randomly pick an option, with replacement, 250 times
+    "City" = sample(
+      x = c("Birmingham", "Chicago"),
+      size = 250,
+      replace = TRUE )
+  )
+
+simulated_data
+```
+

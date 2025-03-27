@@ -31,3 +31,99 @@ simulated_data <-
 simulated_data
 ```
 
+
+```{r}
+library(tidyverse)
+library(tidycensus)
+library(tmap)
+
+tmap_options( basemap.server = "CartoDB")
+tmap_mode( "view" )
+
+il_income <- get_acs(
+  geography = "county",
+  variables = "B19013_001",
+  state = "IL",
+  year = 2020,
+  geometry = TRUE
+)
+
+# only use the following for tract-level data
+# cook_income <- il_income %>%
+#   filter( grepl( pattern = "Cook County", x = NAME, fixed = TRUE))
+
+tm_shape( il_income ) +
+  tm_polygons( fill = "estimate" )
+
+ms_income <- get_acs(
+  geography = "county",
+  variables = "B19013_001",
+  state = "MS",
+  year = 2020,
+  geometry = TRUE
+)
+
+tm_shape( ms_income ) +
+  tm_polygons( fill = "estimate" )
+
+cook_race <- get_decennial(
+  geography = "tract",
+  state = "IL",
+  county = "Cook",
+  variables = c(
+    Hispanic = "P2_002N",
+    White = "P2_005N",
+    Black = "P2_006N",
+    Native = "P2_007N",
+    Asian = "P2_008N"
+  ),
+  summary_var = "P2_001N",
+  year = 2020,
+  geometry = TRUE
+) %>%
+  mutate(percent = 100 * (value / summary_value))
+
+il_race <- get_decennial(
+  geography = "county",
+  state = "IL",
+  variables = c(
+    Hispanic = "P2_002N",
+    White = "P2_005N",
+    Black = "P2_006N",
+    Native = "P2_007N",
+    Asian = "P2_008N"
+  ),
+  summary_var = "P2_001N",
+  year = 2020,
+  geometry = TRUE
+) %>%
+  mutate(percent = 100 * (value / summary_value))
+
+tm_shape( il_race ) +
+  tm_polygons( "percent", fill.legend = NULL ) +
+  tm_facets( "variable", ncol = 3,  )
+
+ms_race <- get_decennial(
+  geography = "county",
+  state = "MS",
+  variables = c(
+    Hispanic = "P2_002N",
+    White = "P2_005N",
+    Black = "P2_006N",
+    Native = "P2_007N",
+    Asian = "P2_008N"
+  ),
+  summary_var = "P2_001N",
+  year = 2020,
+  geometry = TRUE
+) %>%
+  mutate(percent = 100 * (value / summary_value))
+
+tm_shape( ms_race ) +
+  tm_polygons( "percent", fill.legend = NULL ) +
+  tm_facets( "variable", ncol = 3,  )
+```
+
+
+
+

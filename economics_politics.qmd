@@ -1,6 +1,8 @@
 ---
 title: "Economic Status and Political Affiliation"
 format: html
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r}
@@ -9,6 +11,9 @@ library(tidyverse)
 
 # Simulated Data
 ```{r}
+library(tidyverse)
+library(tidycensus)
+library(tmap)
 simulated_data <-
   tibble(
     # Randomly pick an option, with replacement, 250 times
@@ -23,7 +28,7 @@ simulated_data <-
       replace = TRUE ),
     # Randomly pick an option, with replacement, 250 times
     "City" = sample(
-      x = c("Birmingham", "Chicago"),
+      x = c("Mississippi", "Illinois"),
       size = 250,
       replace = TRUE )
   )

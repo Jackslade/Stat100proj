@@ -1,0 +1,179 @@
+---
+title: "Economic Status vs Political Affiliations"
+author: "Abby Burns and Jack Slade"
+format: revealjs
+editor_options: 
+  chunk_output_type: console
+---
+
+## Introduction
+* Political and economic status’ patterns between Mississippi and Illinois
+* Relationships between differing class status and political affiliation
+* Varying trends within class status, political affilation, and demographics
+
+
+
+<!-- ## simulated data -->
+
+```{r}
+#| eval: false
+library(tidyverse)
+library(tidycensus)
+library(tmap)
+simulated_data <-
+  tibble(
+    # Randomly pick an option, with replacement, 250 times
+    "Party" = sample(
+      x = c("Republican", "Democrat", "Other"),
+      size = 250,
+      replace = TRUE ),
+    # Randomly pick an option, with replacement, 250 times
+    "Status" = sample(
+      x = c("Lower", "Middle", "Upper"),
+      size = 250,
+      replace = TRUE ),
+    # Randomly pick an option, with replacement, 250 times
+    "City" = sample(
+      x = c("Mississippi", "Illinois"),
+      size = 250,
+      replace = TRUE )
+  )
+
+simulated_data
+```
+
+## Illinois and Mississippi Income Maps
+
+```{r}
+#| include: FALSE
+
+library(tidyverse)
+library(tidycensus)
+library(tmap)
+
+load( file = "map_data.RData" )
+
+# census_api_key( key = "5648c24a27384735fce980a3a6fb1c7ab54d1fbb")
+
+tmap_options( basemap.server = "CartoDB")
+tmap_mode( "plot" )
+
+# il_income <- get_acs(
+#   geography = "county",
+#   variables = "B19013_001",
+#   state = "IL",
+#   year = 2020,
+#   geometry = TRUE
+# )
+
+max_il_income <- max( il_income$estimate )
+il_income <- il_income |>
+  mutate( max_income = as.numeric( (estimate == max_il_income ) ) )
+
+# ms_income <- get_acs(
+#   geography = "county",
+#   variables = "B19013_001",
+#   state = "MS",
+#   year = 2020,
+#   geometry = TRUE
+# )
+
+max_ms_income <- max( ms_income$estimate )
+ms_income <- ms_income |>
+  mutate( max_income = as.numeric( (estimate == max_ms_income ) ) )
+
+il_income <- il_income |>
+  mutate( State = "IL" )
+ms_income <- ms_income |> 
+  mutate( State = "MS" )
+il_ms_income <- bind_rows( il_income, ms_income )
+
+```
+
+```{r}
+
+tm_shape( il_ms_income ) +
+  tm_polygons( fill = "estimate" ) +
+  tm_facets( "State" )
+
+```
+
+```{r}
+#| eval: FALSE
+
+tm_shape( il_income ) +
+  tm_polygons( fill = "max_income")
+```
+
+## Race Demographics: Illinois 
+```{r}
+#| include: FALSE
+#| 
+# cook_race <- get_decennial(
+#   geography = "tract",
+#   state = "IL",
+#   county = "Cook",
+#   variables = c(
+#     Hispanic = "P2_002N",
+#     White = "P2_005N",
+#     Black = "P2_006N",
+#     Native = "P2_007N",
+#     Asian = "P2_008N"
+#   ),
+#   summary_var = "P2_001N",
+#   year = 2020,
+#   geometry = TRUE
+# ) %>%
+#   mutate(percent = 100 * (value / summary_value))
+
+```
+
+```{r}
+
+# il_race <- get_decennial(
+#   geography = "county",
+#   state = "IL",
+#   variables = c(
+#     Hispanic = "P2_002N",
+#     White = "P2_005N",
+#     Black = "P2_006N",
+#     Native = "P2_007N",
+#     Asian = "P2_008N"
+#   ),
+#   summary_var = "P2_001N",
+#   year = 2020,
+#   geometry = TRUE
+# ) %>%
+#   mutate(percent = 100 * (value / summary_value))
+
+tm_shape( il_race ) +
+  tm_polygons( "percent", fill.legend = NULL ) +
+  tm_facets( "variable", ncol = 3,  )
+
+```
+
+## Race Demographics: Mississippi 
+
+```{r}
+# ms_race <- get_decennial(
+#   geography = "county",
+#   state = "MS",
+#   variables = c(
+#     Hispanic = "P2_002N",
+#     White = "P2_005N",
+#     Black = "P2_006N",
+#     Native = "P2_007N",
+#     Asian = "P2_008N"
+#   ),
+#   summary_var = "P2_001N",
+#   year = 2020,
+#   geometry = TRUE
+# ) %>%
+#   mutate(percent = 100 * (value / summary_value))
+
+tm_shape( ms_race ) +
+  tm_polygons( "percent", fill.legend = NULL ) +
+  tm_facets( "variable", ncol = 3,  )
+```
+
+
